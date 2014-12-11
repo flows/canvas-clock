@@ -1,0 +1,27 @@
+title: alert bug
+
+Log(console/log)
+Caps(string/capitalize)
+Upp(string/toUpperCase)
+Reverse(string/reverse)
+Alert(dom/alert)
+Confirm(dom/confirm)
+
+# should be easier, maybe dom utils/query
+#SetHTML(dom/setHtml)
+
+'Howdy!' -> message Alert
+'Press cancel for Caps, Ok for Uppercase' -> @message Confirm
+
+# creates a bug, ok and this are logged twice
+# if all choices are caps, it works
+# if all choices are uppercase, it works.
+# if I alternate ok and this are done twice !?
+# If I press cancel first, then 3 times ok
+# hello world is reversed three times. others are ok
+# Same if OK, first and rest cancel.
+# hello world is captialized 3 times.
+["Hello world", "ok", "this", "works"] => in Confirm
+
+Confirm yes -> in Upp out -> msg Log
+Confirm no  -> in Reverse out -> msg Log
