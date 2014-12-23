@@ -1,6 +1,7 @@
 title:	Clock
 
-DomImage(dom/image),DomQuerySelector(dom/querySelector),DomSetHtml(dom/setHtml),CanvasGetContext(canvas/getContext),CanvasDrawImage(canvas/drawImage),DomQuerySelector2(dom/querySelector),MathDegreesToRadians(math/degreesToRadians),DateCreate(date/create),DateGetSeconds(date/getSeconds),CanvasBeginPath(canvas/beginPath),CanvasMoveTo(canvas/moveTo),CanvasLineTo(canvas/lineTo),CanvasLineTo2(canvas/lineTo),CanvasLineTo3(canvas/lineTo),CanvasLineTo4(canvas/lineTo),CanvasStroke(canvas/stroke),MathMultiply(math/multiply),CanvasRotate(canvas/rotate),CanvasSetAttributes(canvas/setAttributes),CanvasFill(canvas/fill),CanvasTranslate(canvas/translate),UtilWait(util/wait),ConsoleLog(console/log),CanvasStrokeText(canvas/strokeText),CanvasSave(canvas/save),ConsoleLog2(console/log),DomAddMouseEvent(dom/addMouseEvent),DomAlert(dom/alert),DateCreate2(date/create),CanvasRestore(canvas/restore),CanvasSetAttributes2(canvas/setAttributes)
+DomImage(dom/image),BodyEl(dom/querySelector),SetCanvasHtml(dom/setHtml),GetContext(canvas/getContext),DrawImage(canvas/drawImage),CanvasEl(dom/querySelector),MathDegreesToRadians(math/degreesToRadians),DateCreate(date/create),DateGetSeconds(date/getSeconds),CanvasBeginPath(canvas/beginPath),CanvasMoveTo(canvas/moveTo),CanvasLineTo(canvas/lineTo),CanvasLineTo2(canvas/lineTo),CanvasLineTo3(canvas/lineTo),CanvasLineTo4(canvas/lineTo),CanvasStroke(canvas/stroke),MathMultiply(math/multiply),Rotate(canvas/rotate),SetHandAttributes(canvas/setAttributes),CanvasFill(canvas/fill),CanvasTranslate(canvas/translate),UtilWait(util/wait),ConsoleLog(console/log),CanvasStrokeText(canvas/strokeText),CanvasSave(canvas/save)
+DateCreate2(date/create),CanvasRestore(canvas/restore),SetHandAttributes2(canvas/setAttributes)
 
 SoundAlert(sound/alert)
 Template(template/handlebars)
@@ -10,16 +11,20 @@ Template(template/handlebars)
 '' -> :start DateCreate
 "http://www.dhtmlgoodies.com/tutorials/canvas-clock/images/Clock_Face_2_by_AGF81.png" -> @src DomImage
 
-"body" -> ^selector DomQuerySelector
+"body" -> ^selector BodyEl
 
-"Err<canvas height=\"450\" width=\"450\"></canvas>" -> html DomSetHtml
+"<canvas height=\"450\" width=\"450\"></canvas>" -> html SetCanvasHtml
 
+
+# Add Background Image
+DomImage image -> ^element DrawImage
 {
   "dx": -225, "dy": -225,
   "dw":  450, "dh":  450
-} -> @in CanvasDrawImage
+} -> @in DrawImage
 
-"canvas" -> ^selector DomQuerySelector2
+"canvas" -> ^selector CanvasEl
+CanvasTranslate context -> context DrawImage
 
 { "x":   0, "y":    0 } -> @in CanvasMoveTo
 { "x":  -4, "y":  -10 } -> @in CanvasLineTo
@@ -34,10 +39,10 @@ Template(template/handlebars)
 -40         ->       @x CanvasStrokeText
 -40         ->       @y CanvasStrokeText
 
+ # "globalCompositeOperation": "destination-atop",
 {
   "fillStyle": "blue",
   "globalAlpha": 0.8,
-  "globalCompositeOperation": "destination-atop",
   "lineCap": "butt",
   "lineJoin": "miter",
   "lineWidth": 5,
@@ -46,11 +51,10 @@ Template(template/handlebars)
   "strokeStyle": "yellow",
   "textAlign": "start",
   "textBaseline": "top"
-} -> @in CanvasSetAttributes
+} -> @in SetHandAttributes
 
-
-"click" ->          @event DomAddMouseEvent
-true -   > @preventDefault DomAddMouseEvent
+# correct timeing
+MathDegreesToRadians out -> :start DrawImage
 
 {
   "globalCompositeOperation": "destination-over",
@@ -58,54 +62,52 @@ true -   > @preventDefault DomAddMouseEvent
   "lineJoin": "miter",
   "textAlign": "start",
   "textBaseline": "top"
-} -> @in CanvasSetAttributes2
+} -> @in SetHandAttributes2
 
-#"morse" -> @sound SoundAlert
+"morse" -> @sound SoundAlert
 
-#0.1 -> @volume SoundAlert
+0.1 -> @volume SoundAlert
 
-DomQuerySelector selection -> element DomSetHtml
-DomImage image -> ^element CanvasDrawImage
-DomSetHtml element -> element DomQuerySelector2
-DomQuerySelector2 selection -> canvas CanvasGetContext
+BodyEl selection -> element SetCanvasHtml
+SetCanvasHtml element -> element CanvasEl
+CanvasEl selection -> canvas GetContext
 DateCreate out -> date DateGetSeconds
 CanvasMoveTo context -> context CanvasLineTo
 CanvasLineTo context -> context CanvasLineTo2
 CanvasLineTo2 context -> context CanvasLineTo3
 CanvasLineTo3 context -> context CanvasLineTo4
-MathDegreesToRadians out -> angle CanvasRotate
+MathDegreesToRadians out -> angle Rotate
 CanvasLineTo4 context -> context CanvasFill
 CanvasFill context -> context CanvasStroke
-CanvasGetContext context -> context CanvasTranslate
+
+GetContext context -> context CanvasTranslate
 
 
 DateGetSeconds out -> x MathMultiply
 MathMultiply out -> in MathDegreesToRadians
 MathMultiply out -> msg ConsoleLog
-DomQuerySelector2 selection -> element DomAddMouseEvent
-DomAddMouseEvent event -> msg ConsoleLog2
-DomAddMouseEvent event -> message DomAlert
+
 DateGetSeconds out -> in UtilWait
 UtilWait out -> :start DateCreate2
 DateCreate2 out -> date DateGetSeconds
 DateCreate2 out -> :start DateGetSeconds
 DateCreate out -> :start DateGetSeconds
-CanvasBeginPath context -> context CanvasRotate
-CanvasRotate context -> context CanvasMoveTo
+CanvasBeginPath context -> context Rotate
+Rotate context -> context CanvasMoveTo
 CanvasStroke context -> context CanvasRestore
-CanvasSave context -> context CanvasSetAttributes
-CanvasSetAttributes context -> context CanvasBeginPath
+CanvasSave context -> context SetHandAttributes
+SetHandAttributes context -> context CanvasBeginPath
 
 # roundtrip
-#CanvasTranslate context -> context CanvasDrawImage
-CanvasTranslate context -> context CanvasSave
+#CanvasTranslate context -> context CanvasSave
+DrawImage context -> context CanvasSave
 
-# CanvasDrawImage context -> context CanvasStrokeText
-CanvasSetAttributes2 context -> context CanvasStrokeText
+# DrawImage context -> context CanvasStrokeText
+#SetHandAttributes2 context -> context CanvasStrokeText
 
-CanvasRestore context -> context CanvasSetAttributes2
-CanvasStrokeText context -> context CanvasSave
+#CanvasRestore context -> context SetHandAttributes2
+CanvasRestore context -> context DrawImage
+#CanvasStrokeText context -> context CanvasSave
 
-CanvasGetContext context -> context CanvasDrawImage
-#CanvasSetAttributes2 context -> context CanvasDrawImage
-#UtilWait out -> :start SoundAlert
+#SetHandAttributes2 context -> context DrawImage
+UtilWait out -> :start SoundAlert
