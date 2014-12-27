@@ -1,0 +1,47 @@
+title:	Clock Work
+package: clock
+name: work
+
+MathDegreesToRadians(math/degreesToRadians)
+DateCreate(date/create)
+DateGetSeconds(date/getSeconds)
+MathMultiply(math/multiply)
+UtilWait(util/wait)
+DateCreate2(date/create)
+
+SoundAlert(sound/alert)
+
+Log(console/log)
+
+# probably doesn't work also, never intended
+# maybe this creates a bug, not sure if IIPs of subgraphs
+# are automatically send, they are I think..
+# yep this kinda is a bug. or I probably should just remove it
+#-> :start DateCreate
+'' -> :start DateCreate
+
+DateCreate out -> msg Log
+
+<- out MathDegreesToRadians
+
+
+1000    -> @timeout UtilWait
+6       ->       @y MathMultiply
+"morse" ->   @sound SoundAlert
+0.1     ->  @volume SoundAlert
+
+DateCreate out -> :start DateGetSeconds
+
+DateCreate out -> date DateGetSeconds
+DateGetSeconds out -> x MathMultiply
+
+MathMultiply out -> in MathDegreesToRadians
+#MathDegreesToRadians out -> angle Hand
+
+DateGetSeconds out -> in UtilWait
+
+UtilWait out -> :start SoundAlert
+UtilWait out -> :start DateCreate2
+
+DateCreate2 out -> date DateGetSeconds
+DateCreate2 out -> :start DateGetSeconds

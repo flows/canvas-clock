@@ -1,0 +1,55 @@
+title: Hand
+package: clock
+name: hand
+description: Draws a clock hand
+
+CanvasBeginPath(canvas/beginPath)
+CanvasMoveTo(canvas/moveTo)
+DrawLine(canvas/lineTo)
+DrawLine2(canvas/lineTo)
+DrawLine3(canvas/lineTo)
+DrawLine4(canvas/lineTo)
+Stroke(canvas/stroke)
+Rotate(canvas/rotate)
+SetHandAttributes(canvas/setAttributes)
+FillLine(canvas/fill)
+CanvasSave(canvas/save)
+CanvasRestore(canvas/restore)
+
+# expose ports
+-> context CanvasSave
+->   angle Rotate
+<- context CanvasRestore
+
+{ "x":   0, "y":    0 } -> @in CanvasMoveTo
+{ "x":  -4, "y":  -10 } -> @in DrawLine
+{ "x":   0, "y": -150 } -> @in DrawLine2
+{ "x":   4, "y":  -10 } -> @in DrawLine3
+{ "x":   0, "y":    0 } -> @in DrawLine4
+
+ # "globalCompositeOperation": "destination-atop",
+{
+  "fillStyle": "blue",
+  "globalAlpha": 0.8,
+  "lineCap": "butt",
+  "lineJoin": "miter",
+  "lineWidth": 5,
+  "shadowBlur": 0.8,
+  "shadowColor": "green",
+  "strokeStyle": "yellow",
+  "textAlign": "start",
+  "textBaseline": "top"
+} -> @in SetHandAttributes
+
+# Draw Hand
+CanvasSave context        -> context SetHandAttributes
+SetHandAttributes context -> context CanvasBeginPath
+CanvasBeginPath context   -> context Rotate
+Rotate context            -> context CanvasMoveTo
+CanvasMoveTo context      -> context DrawLine
+DrawLine context          -> context DrawLine2
+DrawLine2 context         -> context DrawLine3
+DrawLine3 context         -> context DrawLine4
+DrawLine4 context         -> context FillLine
+FillLine context          -> context Stroke
+Stroke context            -> context CanvasRestore
