@@ -3,3 +3,4 @@ example/bundle.js
 *.swp
 *.txt
 .c9/
+*.log
