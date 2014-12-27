@@ -6,10 +6,15 @@ SetCanvasHtml(dom/setHtml)
 GetContext(canvas/getContext)
 DrawImage(canvas/drawImage)
 CanvasEl(dom/querySelector)
+MathDegreesToRadians(math/degreesToRadians)
+DateCreate(date/create)
+DateGetSeconds(date/getSeconds)
+MathMultiply(math/multiply)
 CanvasTranslate(canvas/translate)
+UtilWait(util/wait)
+ConsoleLog(console/log)
 StrokeText(canvas/strokeText)
-
-Log(console/log)
+DateCreate2(date/create)
 
 provider ./graphs/{ns}/{name}.fbp as x
 
@@ -20,7 +25,7 @@ SoundAlert(sound/alert)
 Template(template/handlebars)
 
 '' -> :start DomImage
-#'' -> :start DateCreate
+'' -> :start DateCreate
 "http://www.dhtmlgoodies.com/tutorials/canvas-clock/images/Clock_Face_2_by_AGF81.png" -> @src DomImage
 
 "body" -> ^selector BodyEl
@@ -41,15 +46,13 @@ CanvasTranslate context -> context DrawImage
 { "x": 225, "y":  225 } -> @in CanvasTranslate
 
 "Rob Halff" ->    @text StrokeText
+1000        -> @timeout UtilWait
+6           ->       @y MathMultiply
 -40         ->       @x StrokeText
 -40         ->       @y StrokeText
 
 # correct timeing
-ClockWork out -> :start DrawImage
-ClockWork out ->  angle Hand
-ClockWork out -> msg Log
-
-#'' -> :start ClockWork
+MathDegreesToRadians out -> :start DrawImage
 
 "morse" -> @sound SoundAlert
 0.1 -> @volume SoundAlert
@@ -57,11 +60,26 @@ ClockWork out -> msg Log
 BodyEl selection -> element SetCanvasHtml
 SetCanvasHtml element -> element CanvasEl
 CanvasEl selection -> canvas GetContext
+DateCreate out -> date DateGetSeconds
+
+MathDegreesToRadians out -> angle Hand
 
 GetContext context -> context CanvasTranslate
+
+DateGetSeconds out -> x MathMultiply
+MathMultiply out -> in MathDegreesToRadians
+MathMultiply out -> msg ConsoleLog
+
+DateGetSeconds out -> in UtilWait
+UtilWait out -> :start DateCreate2
+DateCreate2 out -> date DateGetSeconds
+DateCreate2 out -> :start DateGetSeconds
+DateCreate out -> :start DateGetSeconds
 
 # roundtrip
 #CanvasTranslate context -> context CanvasSave
 DrawImage context -> context Hand
 
 Hand context -> context DrawImage
+
+UtilWait out -> :start SoundAlert
