@@ -17,8 +17,7 @@
   },
   "homepage": "https://github.com/flows/canvas-clock",
   "devDependencies": {
-    "chix-flow": "^0.12.0",
-    "chix-monitor-npmlog": "git://github.com/psichi/chix-monitor-npmlog",
-    "fbpx-cli": "git://github.com/psichi/fbpx-cli"
+    "chix-flow": "^0.12.1",
+    "chix-monitor-npmlog": "0.0.5"
   }
 }
